@@ -1,0 +1,62 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AuthResponse {
+  token: String!
+  user: User!
+}
+
+type Claim {
+  claim_number: Float!
+  csv_data: String!
+  description: String!
+  id: ID!
+  title: String!
+  user: User!
+}
+
+type Mutation {
+  blockUser(id: ID!): User!
+  updateClaim(updateClaimInput: UpdateClaimInput!): Claim!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+}
+
+type Query {
+  AllClaims: [Claim!]!
+  Claim(term: String!): Claim!
+  revalidate: AuthResponse!
+  user(id: ID!): User!
+  users(roles: [ValidRoles!] = []): [User!]!
+}
+
+input UpdateClaimInput {
+  description: String
+  title: String
+  uuid: String!
+}
+
+input UpdateUserInput {
+  email: String
+  fullName: String
+  id: ID!
+  isActive: Boolean
+  password: String
+  roles: [ValidRoles!]
+}
+
+type User {
+  claims: [Claim!]!
+  email: String!
+  fullName: String!
+  id: Int!
+  isActive: Boolean!
+  lastUpdateBy: User
+  roles: [String!]!
+}
+
+enum ValidRoles {
+  admin
+  superAdmin
+  user
+}
