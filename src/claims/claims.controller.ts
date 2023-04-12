@@ -1,9 +1,12 @@
 import { Controller, Post, Body, Param, Delete, UploadedFile, UseInterceptors, ParseUUIDPipe, UseGuards, Get, Query, UploadedFiles } from '@nestjs/common';
 
-import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
-import { fileFilter } from '../common/helpers/fileFilter.helper';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+  
+import { diskStorage } from 'multer';
+
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
+import { fileFilter, fileNamer } from '../common/helpers'
 
 import { User } from '../users/entities/user.entity';
 
@@ -24,7 +27,13 @@ export class ClaimsController {
 
   @Post()
   @UseInterceptors( FileFieldsInterceptor([{name: 'csv', maxCount: 1},{name: 'img', maxCount: 3}], {
-    fileFilter: fileFilter 
+    fileFilter: fileFilter,
+    //limits: {fileSize: 1000},
+    storage: diskStorage({
+      destination: './static/claims',
+      filename: fileNamer
+      
+    })
    }))
   create(
     @Body() createClaimDto: CreateClaimDto, 
