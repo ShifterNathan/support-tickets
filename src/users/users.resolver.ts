@@ -8,7 +8,7 @@ import { validRolesArgs } from './dto/args/roles.arg';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { ValidRoles } from 'src/auth/enums/valid-roles.enum';
+import { ValidRoles } from '../auth/enums/valid-roles.enum';
 
 @Resolver(() => User)
 @UseGuards( JwtAuthGuard )

@@ -1,13 +1,16 @@
-import { BadRequestException, Injectable, NotFoundException, ParseIntPipe } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { isUUID, IsUUID } from 'class-validator';
+import { isUUID } from 'class-validator';
 import { FilesService } from 'src/common/files/files.service';
-import { Like, Repository } from 'typeorm';
+import { And, Like, Repository } from 'typeorm';
+
+import { Claim } from './entities/claim.entity';
+import { User } from '../users/entities/user.entity';
 
 import { CreateClaimDto } from './dto/create-claim.dto';
 import { UpdateClaimInput } from './dto/update-claim.dto';
-import { Claim } from './entities/claim.entity';
-
+import { paginationDto } from '../common/dtos/pagination.dto';
+import { PaginationDto } from './dto/pagination.dto';
 
 @Injectable()
 export class ClaimsService {
@@ -20,23 +23,36 @@ export class ClaimsService {
     
   ){}
   
-  async create( createClaimDto: CreateClaimDto, file: Express.Multer.File): Promise<CreateClaimDto> {
+  async create( 
+    createClaimDto: CreateClaimDto, 
+    csv: Express.Multer.File, 
+    img: Express.Multer.File,
+    user: User
+  ): Promise<CreateClaimDto> {
 
-    if ( !file ) {
+    if ( !csv ) {
       throw new BadRequestException('Make sure the csv file is uploaded ')
     }
 
-    const csv_data = this.fileService.uploadFile(file)
+    const csv_data = this.fileService.uploadFile(csv, 'csv')
+
+    let img_data = this.fileService.uploadFile(img, 'img')
+    
+    
     const claim_number = await this.getNextClaimNumber();
 
     try{
-      const claim = this.claimRepository.create({...createClaimDto, csv_data, claim_number});
+      const claim = this.claimRepository.create(
+        {...createClaimDto, csv_data, img_data, claim_number, user}
+      );
       await this.claimRepository.save(claim);
       return claim;
     }
 
     catch(error){
-      console.log("error code:", error.code)
+      console.log('error create');
+      
+      // console.log("error code:", error.code)
     }
   }
 
@@ -57,11 +73,31 @@ export class ClaimsService {
       return nextClaimNumber
   }
 
-  async findAll(): Promise<Claim[]> {
-    return this.claimRepository.find();
+  // async findAll( paginationDto: PaginationDto) {
+  //   return this.claimRepository.find()
+  //   .limit(limit)
+  //   .skip(offset);
+  // }
+
+  // SELECT * FROM claims WHERE userId = '10'
+  async findAll( user: User ): Promise<Claim[]> {
+
+    if( user.roles.includes('admin' || 'superAdmin' )) { 
+      return this.claimRepository.find()
+    }
+    else {
+      return this.claimRepository.find({
+        where: {
+          user: {
+            id: user.id
+          }
+        }
+      });
+    }
   }
 
-  async findOneByTerm(term: string): Promise<Claim> {
+
+  async findOneByTerm(term: string, user: User): Promise<Claim> {
     console.log(term);
     
     const isNumber = !isNaN(+term); 
@@ -70,41 +106,63 @@ export class ClaimsService {
 
     if (isUUID(term)) conditions.unshift({ id: term })
     if (isNumber) conditions.push({ claim_number: term })
-    if (term) conditions.push({ title: Like(`%${term.trim().toLocaleLowerCase().normalize('NFD')}%`) })
+    if (term) conditions.push({ title: Like(`%${term.trim().normalize('NFD')}%`) })
     
-
-    const claim = await this.claimRepository.findOne({
-      where: conditions,
-    });
-    
-    if (!claim) {
+    try {
+      if( user.roles.includes('admin' || 'superAdmin' )) {
+        return await this.claimRepository.findOne({
+          where: conditions
+        });
+      }
+      else {
+        return await this.claimRepository.findOne({
+          where: {
+            ...conditions,
+            user: {
+              id: user.id
+            }
+          },
+        });
+      }
+    }
+    catch(error) {
       throw new NotFoundException(`Claim with term '${term}' not found`);
     }
-    
-    return claim;
   }
 
-  async findOneById(id: string): Promise<Claim> {
+  async findOneById(id: string, user: User): Promise<Claim> {
 
-    return await this.claimRepository.findOneBy({ id })
+    try {
+      const claim = await this.claimRepository.findOneBy({id})
+      if( user.roles.includes('admin' || 'superAdmin' )) {                
+        return claim
+      }
+      if( claim.user.id !== user.id ) {
+        throw new BadRequestException('NO TIENES EL ROL')
+      }
+      return claim;
+    }
+    catch(error) {
+      throw new NotFoundException(`Claim with id: ${ id } not found`)
+    }    
   }
 
 
-  async update(term: string, updateClaimInput: UpdateClaimInput) {
+  async update(updateClaimInput: UpdateClaimInput, user: User): Promise<Claim> {
     
-    const claim = await this.findOneByTerm(term)
+    await this.findOneById(updateClaimInput.id, user)
 
-    if(!claim) throw new NotFoundException(`Claim with term '${term}' not found`)
-
-    const updatedClaim = {...claim, ...updateClaimInput}
+    const claim = await this.claimRepository.preload( updateClaimInput )
+    // Without lazy property it should be as follows:
+    //const updatedClaim = {...claim, ...updateClaimInput}
     
-    return this.claimRepository.save(updatedClaim);
+    return this.claimRepository.save(claim);
   }
 
-  async remove(id: string): Promise<Claim> {
+  async remove(id: string, user: User): Promise<Claim> {
 
-    const claim = await this.findOneById( id );
-    await this.claimRepository.delete({id: claim.id})
+    const claim = await this.findOneById( id, user );
+    await this.claimRepository.remove(claim)
 
     return {...claim, id}
   }

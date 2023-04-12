@@ -12,19 +12,21 @@ type Claim {
   csv_data: String!
   description: String!
   id: ID!
+  img_data: String!
   title: String!
   user: User!
 }
 
 type Mutation {
   blockUser(id: ID!): User!
+  deleteClaim(id: ID!): Claim!
   updateClaim(updateClaimInput: UpdateClaimInput!): Claim!
   updateUser(updateUserInput: UpdateUserInput!): User!
 }
 
 type Query {
   AllClaims: [Claim!]!
-  Claim(term: String!): Claim!
+  ClaimByTerm(term: String!): Claim!
   revalidate: AuthResponse!
   user(id: ID!): User!
   users(roles: [ValidRoles!] = []): [User!]!
@@ -32,8 +34,8 @@ type Query {
 
 input UpdateClaimInput {
   description: String
+  id: String!
   title: String
-  uuid: String!
 }
 
 input UpdateUserInput {

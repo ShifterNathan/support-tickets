@@ -1,5 +1,6 @@
 import { Field, ID, ObjectType } from "@nestjs/graphql";
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { IsOptional } from "class-validator";
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, Index } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
 @Entity()
@@ -26,7 +27,13 @@ export class Claim {
     @Field()
     csv_data: string;    
 
-    @ManyToOne( () => User, (user) => user.claims )
+    @Column({nullable: true})
+    @Field()
+    @IsOptional()
+    img_data?: string
+
+    @ManyToOne( () => User, (user) => user.claims, { nullable: false, eager: true })
+    @Index('userId-index')
     @Field( () => User)
     user: User;
 

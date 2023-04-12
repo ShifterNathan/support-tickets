@@ -8,7 +8,7 @@ export class UpdateClaimInput extends PartialType(CreateClaimDto) {
 
     @Field(() => String)
     @IsUUID()
-    uuid: string;
+    id: string;
 
     @Field(() => String, {nullable: true})
     @IsString()
