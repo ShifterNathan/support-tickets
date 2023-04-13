@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common';
+import { ParseUUIDPipe, UseGuards } from '@nestjs/common';
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { Claim } from './entities/claim.entity';
@@ -43,7 +43,7 @@ export class ClaimsResolver {
 
     @Mutation( () => Claim, {name: 'deleteClaim'})
     delete(
-        @Args('id', { type: () => ID }) id: string,
+        @Args('id', { type: () => ID }, ParseUUIDPipe) id: string,
         @CurrentUser() user: User
     ): Promise<Claim> {
         return this.claimsService.remove(id, user)

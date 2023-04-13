@@ -3,15 +3,17 @@
 </p>
 
 
-Installations: 
-1. Install Docker: `https://www.docker.com`
-2. Install TablePlus: `https://tableplus.com`
+# Installations: 
 
-1. Install yarn executing this command:
+1. Node: `https://nodejs.org/en/download`
+2. Docker: `https://www.docker.com`
+3. TablePlus: `https://tableplus.com`
+
+4. Install yarn executing this command:
 ```
 npm install --global yarn
 ```
-3. Install nest executing the following command
+5. Install nest executing the following command
 ```
 yarn add @nestjs/cli
 ```
@@ -34,3 +36,5 @@ docker-compose up -d
 ```
 yarn start:dev
 ```
+
+8. Check out the .pdf file and find how to use the app and how was the development process

@@ -14,9 +14,7 @@ import { ClaimsService } from './claims.service';
 
 import { CreateClaimDto } from './dto/create-claim.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { paginationDto } from '../common/dtos/pagination.dto';
-import { PaginationDto } from './dto/pagination.dto';
-import { ValidRoles } from 'src/auth/enums/valid-roles.enum';
+
 
 @Controller('claim')
 @UseGuards(JwtAuthGuard)
