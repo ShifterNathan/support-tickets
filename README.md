@@ -5,9 +5,9 @@
 
 # Installations: 
 
-1. Node: `https://nodejs.org/en/download`
-2. Docker: `https://www.docker.com`
-3. TablePlus: `https://tableplus.com`
+1. Node: https://nodejs.org/en/download
+2. Docker: https://www.docker.com
+3. TablePlus: https://tableplus.com
 
 4. Install yarn executing this command:
 ```
