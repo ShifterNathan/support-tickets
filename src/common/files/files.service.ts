@@ -4,13 +4,11 @@ import { parse } from 'csv-parse/sync';
 @Injectable()
 export class FilesService {
 
-    uploadFile(file: Express.Multer.File, fileType: String) {
-        if (fileType === 'csv') {
-            return file.originalname
+    uploadFile(file: Express.Multer.File, fileType: string): string | null {
+        if (file && (fileType === 'csv' || fileType === 'img')) {
+          return file.originalname;
         }
-        if (fileType === 'img') {
-            return file.originalname
-        }
+        return null;
     }
 
     // uploadFile(file: Express.Multer.File, fileType: String) {

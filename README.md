@@ -18,7 +18,7 @@ npm install --global yarn
 yarn add @nestjs/cli
 ```
 
-# Dev
+# Execution:
 
 1. Clone the project
 2. Copy the ```.env.template``` and rename it to ```.env```
@@ -36,5 +36,10 @@ docker-compose up -d
 ```
 yarn start:dev
 ```
+
+# Usage: 
+
+R
+
 
 8. Check out the .pdf file and find how to use the app and how was the development process

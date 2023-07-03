@@ -12,16 +12,15 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClaimsModule } from './claims/claims.module';
-import { SeedModule } from './seed/seed.module';
+
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-
+import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
 
     ConfigModule.forRoot(),
-
     // GraphQL config to block the schema if token is not provided/valid
     GraphQLModule.forRootAsync({
       driver: ApolloDriver,
@@ -72,9 +71,10 @@ import { AuthModule } from './auth/auth.module';
     }),
 
     ClaimsModule,
-    SeedModule,
     UsersModule,
     AuthModule,
+    SeedModule,
+
     
   ],
   controllers: [AppController],

@@ -20,6 +20,9 @@ type Claim {
 type Mutation {
   blockUser(id: ID!): User!
   deleteClaim(id: ID!): Claim!
+
+  """Execute database build construction"""
+  excuteSeed: Boolean!
   updateClaim(updateClaimInput: UpdateClaimInput!): Claim!
   updateUser(updateUserInput: UpdateUserInput!): User!
 }

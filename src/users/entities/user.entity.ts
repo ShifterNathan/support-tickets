@@ -44,6 +44,5 @@ export class User {
 
   @OneToMany( () => Claim, (claim) => claim.user )
   @Field( () => [Claim] )
-  claims: Claim[];
-
+  claims: Claim[]
 }
